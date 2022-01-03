@@ -18,6 +18,7 @@ jobs:
         sudo apt-get install jq moreutils
         npm install -g wikibase-cli
         curl -L https://github.com/every-politician-scrapers/shared/raw/main/bin/qsv -o /usr/local/bin/qsv
+        chmod 755 /usr/local/bin/qsv
         bundle install
     - name: Compare external sources to Wikidata
       run: |-
