@@ -16,7 +16,7 @@ jobs:
     - name: install qsv
       run: curl -L https://github.com/every-politician-scrapers/shared/raw/main/bin/qsv -o /usr/local/bin/qsv && chmod 755 /usr/local/bin/qsv
     - name: install latest PCB
-      run: curl -L https://github.com/every-politician-scrapers/cabinet-template/raw/main/pcb/pcb.tgz | tar xfz -
+      run: curl -L https://github.com/every-politician-scrapers/shared/raw/main/pcb/pcb.tgz | tar xfz -
     - name: generate files
       run: bash pcb/generate-html.sh | tee /tmp/PCBout.md
     - id: get-pr-body
