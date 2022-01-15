@@ -104,9 +104,15 @@ erb country="$(jq -r .jurisdiction.name meta.json)" csvfile=html/current.csv -r 
 
 IFS=$'\n'
 
-warnings=($(qsv join --left-anti title wikidata/wanted-positions.csv position html/current.csv | qsv behead))
+warnings=($(qsv join --left-anti title wikidata/wanted-positions.csv position html/current.csv | qsv join position - id html/positions.csv | qsv search -s end -v . | qsv select position,title | qsv behead))
 if [ ${#warnings[@]} -gt 0 ]; then
-  echo "## No matches for:"
+  echo "## No current holders for:"
+  printf '* %s\n' "${warnings[@]}"
+fi
+
+warnings=($(qsv join --left-anti title wikidata/wanted-positions.csv position html/holders21.csv | qsv behead))
+if [ ${#warnings[@]} -gt 0 ]; then
+  echo "## No knowns holders for:"
   printf '* %s\n' "${warnings[@]}"
 fi
 
