@@ -13,7 +13,7 @@ PERSON_PROPS="en,P31,P18,P21,P27,P1559,P1477,P2561,P735,P734,P1950,P5056,P2652,P
 POSITION_PROPS="en,P571,P576,P580,P582,P1308,P17,P1001,P2354,P2098,P1365,P1366,P155,P156,sitelinks"
 
 # Data about each wanted position
-qsv enum wikidata/wanted-positions.csv > $ENUM_PS
+qsv cat rows wikidata/*-positions.csv | qsv enum > $ENUM_PS
 qsv select position wikidata/wanted-positions.csv |
   qsv sort |
   qsv behead |
@@ -40,7 +40,7 @@ jq -r 'def highest(array): (array | sort_by(.rank) | reverse | first.value);
   qsv select 4- > html/positions.csv
 
 # Holders of each wanted position
-qsv cat rows wikidata/wanted-positions.csv wikidata/legislative-positions.csv |
+qsv cat rows wikidata/*-positions.csv |
   qsv select position |
   qsv behead |
   xargs wd sparql pcb/holders.js -f csv > $TMPFILE
@@ -76,26 +76,32 @@ jq -r 'def highest(array): (array | sort_by(.rank) | reverse | first.value);
 
 # Generate holders21.csv, keeping position order from wanted-positions
 qsv join position $ENUM_PS position $HOLDERS |
-  qsv select index,position,title,person,start,end,prev,next > $TMPFILE
-qsv join person $TMPFILE id $BIO_CSV |
+  qsv select index,position,title,person,start,end,prev,next |
+  qsv join person - id $BIO_CSV |
   qsv sort -s person |
   qsv sort -s start |
   qsv sort -N -s index |
   qsv select title,name,person,start,end,gender,dob,dod,image,enwiki,prev,next |
   qsv rename position,person,personID,start,end,gender,DOB,DOD,image,enwiki,prev,next > $EXTD_21
-qsv select \!prev $EXTD_21 | qsv select \!next | uniq > html/holders21.csv
 
+# Only include legislative members in legislators.csv
 qsv join position wikidata/legislative-positions.csv position $HOLDERS |
-  qsv select position,title,person,start,end,prev,next > $TMPFILE
-qsv join person $TMPFILE id $BIO_CSV |
+  qsv select position,title,person,start,end,prev,next |
+  qsv join person - id $BIO_CSV |
   qsv sort -s person |
   qsv sort -s start |
   qsv sort -s position |
   qsv select title,name,person,start,end,gender,dob,dod,image,enwiki |
   qsv rename position,person,personID,start,end,gender,DOB,DOD,image,enwiki > html/legislators.csv
 
-# Generate current.csv
-qsv search -s end -v . html/holders21.csv | qsv select \!end > html/current.csv
+# Remove legislative members to create holders21.csv
+qsv join --left-anti position $EXTD_21 title wikidata/legislative-positions.csv |
+  qsv select \!prev | qsv select \!next | uniq > html/holders21.csv
+
+# no end-date, and in wanted-positions => current.csv
+qsv join position html/holders21.csv title wikidata/wanted-positions.csv |
+  qsv search -s end -v . |
+  qsv select position,person,personID,start,gender,DOB,DOD,image,enwiki > html/current.csv
 
 # Generate HTML
 erb country="$(jq -r .jurisdiction.name meta.json)" csvfile=html/current.csv -r csv -T- pcb/index.erb > html/index.html
