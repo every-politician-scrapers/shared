@@ -35,6 +35,7 @@ jq -r 'def highest(array): (array | sort_by(.rank) | reverse | first.value);
     (try (.sitelinks.enwiki) catch null)
   ] | @csv' $RAWPOSN |
   qsv rename -n 'id,position,country,jurisdiction,deputy,list,start,end,before,after,enwiki' |
+  qsv dedup |
   qsv join position $ENUM_PS id - |
   qsv sort -N -s index |
   qsv select 4- > html/positions.csv
