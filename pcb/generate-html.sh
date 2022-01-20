@@ -93,7 +93,7 @@ qsv join position wikidata/legislative-positions.csv position $HOLDERS |
   qsv sort -s start |
   qsv sort -s position |
   qsv select title,name,person,start,end,gender,dob,dod,image,enwiki |
-  qsv rename position,person,personID,start,end,gender,DOB,DOD,image,enwiki > html/legislators.csv
+  qsv rename position,person,personID,start,end,gender,DOB,DOD,image,enwiki | uniq > html/legislators.csv
 
 # Remove legislative members to create holders21.csv
 qsv join --left-anti position $EXTD_21 title wikidata/legislative-positions.csv |
@@ -102,7 +102,7 @@ qsv join --left-anti position $EXTD_21 title wikidata/legislative-positions.csv 
 # no end-date, and in wanted-positions => current.csv
 qsv join position html/holders21.csv title wikidata/wanted-positions.csv |
   qsv search -s end -v . |
-  qsv select position,person,personID,start,gender,DOB,DOD,image,enwiki > html/current.csv
+  qsv select position,person,personID,start,gender,DOB,DOD,image,enwiki | uniq > html/current.csv
 
 # Generate HTML
 erb country="$(jq -r .jurisdiction.name meta.json)" csvfile=html/current.csv -r csv -T- pcb/index.erb > html/index.html
