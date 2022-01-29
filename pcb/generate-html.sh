@@ -135,7 +135,7 @@ if [ ${#warnings[@]} -gt 0 ]; then
   printf '* %s\n' "${warnings[@]}"
 fi
 
-warnings=($(qsv join --left-anti wdid data/wikidata.csv personID html/current.csv | qsv select wdid,name,pid,position | qsv behead))
+warnings=($(qsv join --left-anti item wikidata/results/current-cabinet.csv personID html/current.csv | qsv select item,itemLabel,position,positionLabel | qsv behead))
 if [ ${#warnings[@]} -gt 0 ]; then
   echo "## In data/wikidata but not current.csv:"
   printf '* %s\n' "${warnings[@]}"
