@@ -159,7 +159,7 @@ if [ ${#warnings[@]} -gt 0 ]; then
   printf '* %s\n' "${warnings[@]}"
 fi
 
-warnings=($(qsv join --left-anti prev $EXTD_21 id $BIO_CSV | qsv search -s start "^2" | qsv search -s prev . | qsv select prev,position,start,personID | qsv sort -s start -R | qsv behead | qsv table))
+warnings=($(qsv join --left-anti prev $EXTD_21 id $BIO_CSV | qsv search -s start "^2" | qsv search -s prev . | qsv select prev,position,start,personID | qsv sort -s start -R | uniq | qsv behead | qsv table | head -30))
 if [ ${#warnings[@]} -gt 0 ]; then
   echo "## Missing predecessors:"
   echo '```'
@@ -167,7 +167,7 @@ if [ ${#warnings[@]} -gt 0 ]; then
   echo '```'
 fi
 
-warnings=($(qsv join --left-anti next $EXTD_21 id $BIO_CSV | qsv search -s next . | qsv select next,position,end,personID | qsv sort -s end -R | qsv behead | qsv table))
+warnings=($(qsv join --left-anti next $EXTD_21 id $BIO_CSV | qsv search -s next . | qsv select next,position,end,personID | qsv sort -s end -R | uniq | qsv behead | qsv table | head -30))
 if [ ${#warnings[@]} -gt 0 ]; then
   echo "## Missing successors:"
   echo '```'
