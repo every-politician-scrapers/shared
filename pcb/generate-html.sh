@@ -82,8 +82,8 @@ qsv join position $ENUM_PS position $HOLDERS |
   qsv sort -s person |
   qsv sort -s start |
   qsv sort -N -s index |
-  qsv select title,name,person,start,end,gender,dob,dod,image,enwiki,prev,next |
-  qsv rename position,person,personID,start,end,gender,DOB,DOD,image,enwiki,prev,next > $EXTD_21
+  qsv select position,title,name,person,start,end,gender,dob,dod,image,enwiki,prev,next |
+  qsv rename positionid,position,person,personID,start,end,gender,DOB,DOD,image,enwiki,prev,next > $EXTD_21
 
 # Only include legislative members in legislators.csv
 qsv join position wikidata/legislative-positions.csv position $HOLDERS |
@@ -96,11 +96,12 @@ qsv join position wikidata/legislative-positions.csv position $HOLDERS |
   qsv rename position,person,personID,start,end,gender,DOB,DOD,image,enwiki | uniq > html/legislators.csv
 
 # Remove legislative members to create holders21.csv
-qsv join --left-anti position $EXTD_21 title wikidata/legislative-positions.csv |
-  qsv select \!prev | qsv select \!next | uniq > html/holders21.csv
+qsv join --left-anti positionid $EXTD_21 position wikidata/legislative-positions.csv |
+  qsv select positionid,position,person,personID,start,end,gender,DOB,DOD,image,enwiki | uniq > $TMPFILE
+qsv select \!positionid $TMPFILE > html/holders21.csv
 
 # no end-date, and in wanted-positions => current.csv
-qsv join position html/holders21.csv title wikidata/wanted-positions.csv |
+qsv join positionid $TMPFILE position wikidata/wanted-positions.csv |
   qsv search -s end -v . |
   qsv select position,person,personID,start,gender,DOB,DOD,image,enwiki | uniq > html/current.csv
 
