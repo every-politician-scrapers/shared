@@ -5,8 +5,10 @@ IFS=$'\n'
 mkdir -p enwiki/page
 
 # Extract core info from people pages (other that QEII
+# TODO: also include current legislators
+# TODO: include people who left office very recently
 
-for page in $(fgrep -v Q9682 html/current.csv | qsv select enwiki | qsv search . | qsv dedup | qsv sort | qsv behead); do
+for page in $(qsv search -s end -v . html/holders21.csv | fgrep -v Q9682, | qsv select enwiki | qsv search . | qsv dedup | qsv sort | qsv behead); do
   echo $page
   json=$(printf '"%s"' "$page" | xargs wtf_wikipedia)
   pageid=$(printf '%s' "$json" | jq -r .pageID)
