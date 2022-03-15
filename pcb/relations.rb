@@ -14,7 +14,7 @@ json = JSON.parse(jsontxt, symbolize_names: true)
 
 out = json.flat_map do |pep|
   pep[:family].flat_map do |relation, relatives|
-    relatives.map do |relative|
+    relatives.compact.map do |relative|
       [pep[:id], pep[:name], relation.to_s, relative, name[relative]]
     end
   end
