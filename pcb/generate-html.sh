@@ -8,8 +8,10 @@ RAWPOSN=$(mktemp)
 BIO_CSV=$(mktemp)
 ENUM_PS=$(mktemp)
 EXTD_21=$(mktemp)
+FAMINFO=$(mktemp)
+FAMNAME=$(mktemp)
 
-PERSON_PROPS="en,P31,P18,P21,P27,P1559,P1477,P2561,P735,P734,P1950,P5056,P2652,P569,P19,P570,P22,P25,P26,P40,P3373,P39,P69,P511,P102,P3602,sitelinks"
+PERSON_PROPS="en,P31,P18,P21,P27,P1559,P1477,P2561,P735,P734,P1950,P5056,P2652,P569,P19,P570,P22,P25,P26,P40,P3373,P39,P69,P511,P102,P3602,P22,P25,P26,P40,P3448,P451,P3373,P1290,P8810,P1038,sitelinks"
 POSITION_PROPS="en,P571,P576,P580,P582,P1308,P17,P1001,P2354,P2098,P1365,P1366,P155,P156,sitelinks"
 
 # Data about each wanted position
@@ -74,6 +76,27 @@ jq -r 'def highest(array): (array | sort_by(.rank) | reverse | first.value);
     (try (.sitelinks.enwiki) catch null)
   ] | @csv' $RAWBIOS |
   sed -e 's/Q6581097/male/' -e 's/Q6581072/female/' -e 's/Q1052281/female/' >> $BIO_CSV
+
+# Family of officeholders
+# TODO: dates? other relationships.
+jq -r '{
+    id: .id,
+    name: .labels.en,
+    family: {
+      father: [(.claims.P22[] | .value)],
+      mother: [(.claims.P25[] | .value)],
+      parent: [(.claims.P8810[] | .value)],
+      stepparent: [(.claims.P3448[] | .value)],
+      godparent: [(.claims.P1290[] | .value)],
+      sibling: [(.claims.P3373[] | .value)],
+      spouse: [(.claims.P26[] | .value)],
+      partner: [(.claims.P451[] | .value)],
+      child: [(.claims.P40[] | .value)],
+      relative: [(.claims.P1038[] | .value)],
+    }
+}' $RAWBIOS | jq -s . > $FAMINFO
+(jq -r '.[] | .family | add | .[]' $FAMINFO  | sort | uniq | xargs -L 50 wd label) | sed -e 's/  */,/' | qsv rename -n 'id,name' > $FAMNAME
+ruby pcb/relations.rb $FAMINFO $FAMNAME > html/family.csv
 
 # Generate holders21.csv, keeping position order from wanted-positions
 qsv join position $ENUM_PS position $HOLDERS |
