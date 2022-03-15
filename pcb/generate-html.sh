@@ -95,7 +95,9 @@ jq -r '{
       relative: [(.claims.P1038[] | .value)],
     }
 }' $RAWBIOS | jq -s . > $FAMINFO
-(jq -r '.[] | .family | add | .[]' $FAMINFO  | sort | uniq | egrep Q | xargs -L 50 wd label) | sed -e 's/  */,"/' -e 's/$/"/' | qsv rename -n 'id,name' > $FAMNAME
+jq -r '.[] | .family | add | .[]' $FAMINFO  | sort | uniq | egrep Q | xargs wd data --props labels --simplify |
+jq -r '.[] | .family | add | .[]' $FAMINFO  | sort | uniq | egrep Q | xargs wd data --props labels --simplify |
+  jq -r '[.id, .labels.en // first(.labels[])] | @csv' | qsv rename -n 'id,name' > $FAMNAME
 ruby pcb/relations.rb $FAMINFO $FAMNAME > html/family.csv
 
 # Generate holders21.csv, keeping position order from wanted-positions
