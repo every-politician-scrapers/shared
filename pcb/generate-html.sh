@@ -11,7 +11,7 @@ EXTD_21=$(mktemp)
 FAMINFO=$(mktemp)
 FAMNAME=$(mktemp)
 
-PERSON_PROPS="en,P31,P18,P21,P27,P1559,P1477,P2561,P735,P734,P1950,P5056,P2652,P569,P19,P570,P22,P25,P26,P40,P3373,P39,P69,P511,P102,P3602,P22,P25,P26,P40,P3448,P451,P3373,P1290,P8810,P1038,sitelinks"
+PERSON_PROPS="labels,P31,P18,P21,P27,P1559,P1477,P2561,P735,P734,P1950,P5056,P2652,P569,P19,P570,P22,P25,P26,P40,P3373,P39,P69,P511,P102,P3602,P22,P25,P26,P40,P3448,P451,P3373,P1290,P8810,P1038,sitelinks"
 POSITION_PROPS="en,P571,P576,P580,P582,P1308,P17,P1001,P2354,P2098,P1365,P1366,P155,P156,sitelinks"
 
 # Data about each wanted position
@@ -66,7 +66,7 @@ echo "id,name,gender,dob,dobp,dod,dodp,image,enwiki" > $BIO_CSV
 jq -r 'def highest(array): (array | sort_by(.rank) | reverse | first.value);
   [
     .id,
-    .labels.en,
+    .labels.en // first(.labels[]),
     highest(.claims.P21),
     if highest(.claims.P569).precision >= 9 then highest(.claims.P569).time else null end,
     highest(.claims.P569).precision,
@@ -95,7 +95,6 @@ jq -r '{
       relative: [(.claims.P1038[] | .value)],
     }
 }' $RAWBIOS | jq -s . > $FAMINFO
-jq -r '.[] | .family | add | .[]' $FAMINFO  | sort | uniq | egrep Q | xargs wd data --props labels --simplify |
 jq -r '.[] | .family | add | .[]' $FAMINFO  | sort | uniq | egrep Q | xargs wd data --props labels --simplify |
   jq -r '[.id, .labels.en // first(.labels[])] | @csv' | qsv rename -n 'id,name' > $FAMNAME
 ruby pcb/relations.rb $FAMINFO $FAMNAME > html/family.csv
