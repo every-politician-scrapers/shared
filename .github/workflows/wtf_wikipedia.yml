@@ -12,7 +12,7 @@ jobs:
     - name: Install dependencies
       run: |-
         sudo apt-get install jq
-        npm install -g wtf_wikipedia
+        npm install -g wtf_wikipedia@9.1.0
         curl -L https://github.com/every-politician-scrapers/shared/raw/main/bin/qsv -o /usr/local/bin/qsv
         chmod 755 /usr/local/bin/qsv
         curl -L https://raw.githubusercontent.com/every-politician-scrapers/shared/main/bin/wtf_enwiki.sh -o /usr/local/bin/wtf_enwiki.sh
