@@ -21,9 +21,12 @@ jobs:
         chmod 755 /usr/local/bin/qsv
         bundle install
     - name: Compare external sources to Wikidata
+      id: run-comp
       run: |-
         shopt -s globstar
-        for comp in **/compare*.sh; do bash $comp; done
+        (for comp in **/compare*.sh; do bash $comp; done) 2> /tmp/ERRORS
+        body=$(cat /tmp/ERRORS)
+        echo ::set-output name=body::$body
     - name: Create pull request
       id: cpr
       uses: peter-evans/create-pull-request@v3
@@ -35,6 +38,7 @@ jobs:
         branch: compare
         delete-branch: true
         title: 'Compare external sources to Wikidata'
+        body: ${{ steps.run-comp.outputs.body }}
         assignees: tmtmtmtm
         reviewers: tmtmtmtm
     - name: Check outputs
