@@ -24,8 +24,11 @@ jobs:
       id: run-comp
       run: |-
         shopt -s globstar
-        (for comp in **/compare*.sh; do bash $comp; done) 2> /tmp/ERRORS
-        body=$(cat /tmp/ERRORS)
+        (for comp in **/compare*.sh; do echo "# $comp" && echo "\`\`\`" && bash $comp; echo "\`\`\`"; done) 2>&1 | tee /tmp/OUTPUT
+        body=$(cat /tmp/OUTPUT)
+        body="${body//'%'/'%25'}"
+        body="${body//$'\n'/'%0A'}"
+        body="${body//$'\r'/'%0D'}"
         echo ::set-output name=body::$body
     - name: Create pull request
       id: cpr
