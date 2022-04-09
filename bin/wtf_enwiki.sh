@@ -16,9 +16,11 @@ for page in $(qsv search -s end -v . html/holders21.csv | fgrep -v Q9682, | qsv 
   pageid=$(printf '%s' "$json" | jq -r .pageID)
   title=$(printf '%s' "$json" | jq -r .title)
   printf '%s' "$json" | jq -r '.sections[].infoboxes[]? | to_entries | map({ (.key): .value.text }) | add' > enwiki/$pageid
-  # TODO: quote the titles
-  echo "$pageid,$title" >> enwiki/index.csv
+  # TODO: handle titles containing quote marks
+  echo "$pageid,\"$title\"" >> enwiki/index.csv
 done
+
+qsv select 1,2 enwiki/index.csv | qsv sort -N -s pageid  | ifne tee enwiki/index.csv
 
 # Extract all info from pages listed in 'wpwatch' files
 
