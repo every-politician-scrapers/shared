@@ -3,8 +3,6 @@ let rawmeta = fs.readFileSync('meta.json');
 let meta = JSON.parse(rawmeta);
 
 module.exports = function () {
-  let datefilter = meta.start ? `FILTER (!BOUND(?startV) || (?startV >= "${meta.start}T00:00:00Z"^^xsd:dateTime))` : '';
-
   return `SELECT DISTINCT ?item ?itemLabel ?startDate ?endDate ?sourceDate
                (STRAFTER(STR(?held), '/statement/') AS ?psid)
         WHERE {
@@ -32,7 +30,7 @@ module.exports = function () {
               ""
             ) AS ?endDate)
           }
-          ${datefilter}
+          FILTER (!BOUND(?endV) || (?endV >= "2000-01-01T00:00:00Z"^^xsd:dateTime))
 
           OPTIONAL {
             ?held prov:wasDerivedFrom ?ref .
