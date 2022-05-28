@@ -32,9 +32,10 @@ claims=$(qsv search -u -i $scheck scraped.csv | qsv select $SCRAPED_NAME | qsv b
 echo "$statementid $claims"
 echo "$statementid $claims" | xargs wd ar --maxlag 20 add-source-name.js > /dev/null
 
-existing=$(wd label $item)
+lang=$(jq -r .lang meta.json)
+existing=$(wd label $item -l $lang)
 if [[ $existing != $name ]]
 then
   echo "Add alias: $item -> $name ($existing)"
-  wd add-alias $item en $name > /dev/null
+  wd add-alias $item $lang $name > /dev/null
 fi
