@@ -1,0 +1,21 @@
+{
+    "position": "Qxxx",
+    "term": {
+        "id":       "Qxxx",
+        "start":    "XXX",
+        "end":      "XXX",
+        "election": "Qxxx"
+    },
+    "lang": "en",
+    "reference": {
+        "P854": "https://xxx",
+        "P577": "2000-00-00",
+        "P1476": {
+            "text": "TITLE",
+            "language": "en"
+        }
+    },
+    "person_description": {
+        "en": "Sudanese politician"
+    }
+}
