@@ -1,3 +1,5 @@
+// qsv search -s item Q diff.csv | qsv search -s @@ '\+\+' | qsv select item,itemlabel,startdate,enddate | qsv behead | qsv fmt -t " "  | wd ee add-p39.js --batch
+
 const fs = require('fs');
 let rawmeta = fs.readFileSync('meta.json');
 let meta = JSON.parse(rawmeta);
