@@ -178,7 +178,7 @@ if [ ${#warnings[@]} -gt 0 ]; then
   printf '* %s\n' "${warnings[@]}"
 fi
 
-warnings=($(qsv search -s gender -v male html/current.csv | qsv behead))
+warnings=($(qsv search -s gender -v male html/current.csv | qsv select 1-3 | qsv behead))
 if [ ${#warnings[@]} -gt 0 ]; then
   echo "## Missing gender:"
   printf '* %s\n' "${warnings[@]}"
