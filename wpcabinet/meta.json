@@ -1,13 +1,17 @@
 {
-    "jurisdiction": {
-        "name": "Kuwait",
-        "id": "Q817"
+    "position": "Q21295131",
+    "term": {
+        "id":       "Q112659683",
+        "start":    "2002-07-11",
+        "end":      "2008-08-05",
+        "election": "Q112659675"
     },
-    "cabinet": {
-        "id":     "Q110300636",
-        "start":  "2021-12-28",
-        "parent": "Q5015525"
-    },
-    "source": "https://en.wikipedia.org/wiki/39th_Cabinet_of_Kuwait",
-    "lang": "en"
+    "lang": "en",
+    "reference": {
+        "P854": "http://www.congopage.com/forums/viewtopic.php?f=22&t=481",
+        "P1476": {
+            "text": "Résusltats des élections",
+            "language": "fr"
+        }
+    }
 }

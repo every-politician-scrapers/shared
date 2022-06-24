@@ -3,39 +3,32 @@ let rawmeta = fs.readFileSync('meta.json');
 let meta = JSON.parse(rawmeta);
 
 module.exports = function () {
-  let fromd = `"${meta.cabinet.start}T00:00:00Z"^^xsd:dateTime`
-  let until = meta.cabinet.end ? `"${meta.cabinet.end}T00:00:00Z"^^xsd:dateTime` : "NOW()"
+  let fromd = `"${meta.term.start}T00:00:00Z"^^xsd:dateTime`
+  let until = meta.term.end  ? `"${meta.term.end}T00:00:00Z"^^xsd:dateTime` : "NOW()"
 
-  return `SELECT DISTINCT ?item ?itemLabel ?position ?positionLabel
-           ?startDate ?endDate ?source ?sourceDate
-           (STRAFTER(STR(?ps), STR(wds:)) AS ?psid)
+  return `SELECT DISTINCT ?item ?itemLabel ?party ?partyLabel ?area ?areaLabel
+                 ?startDate ?endDate ?gender (STRAFTER(STR(?ps), STR(wds:)) AS ?psid)
     WITH {
       SELECT DISTINCT ?item ?position ?startNode ?endNode ?ps
       WHERE {
-          # Positions currently in the cabinet
-          ?position p:P361 ?cs .
-          ?cs ps:P361 wd:${meta.cabinet.parent} .
-          FILTER NOT EXISTS { ?cs pq:P582 [] }
-
-          # Who held those positions
           ?item wdt:P31 wd:Q5 ; p:P39 ?ps .
           ?ps ps:P39 ?position .
+          ?position wdt:P279* wd:${meta.position} .
           FILTER NOT EXISTS { ?ps wikibase:rank wikibase:DeprecatedRank }
-
           OPTIONAL { ?item p:P570 [ a wikibase:BestRank ; psv:P570 ?dod ] }
           OPTIONAL { ?ps pqv:P580 ?p39start }
           OPTIONAL { ?ps pqv:P582 ?p39end }
           OPTIONAL {
-            ?ps pq:P5054 ?cabinet .
-            OPTIONAL { ?cabinet p:P571 [ a wikibase:BestRank ; psv:P571 ?cabinetInception ] }
-            OPTIONAL { ?cabinet p:P580 [ a wikibase:BestRank ; psv:P580 ?cabinetStart ] }
-            OPTIONAL { ?cabinet p:P576 [ a wikibase:BestRank ; psv:P576 ?cabinetAbolished ] }
-            OPTIONAL { ?cabinet p:P582 [ a wikibase:BestRank ; psv:P582 ?cabinetEnd ] }
+            ?ps pq:P2937 ?term .
+            OPTIONAL { ?term p:P571 [ a wikibase:BestRank ; psv:P571 ?termInception ] }
+            OPTIONAL { ?term p:P580 [ a wikibase:BestRank ; psv:P580 ?termStart ] }
+            OPTIONAL { ?term p:P576 [ a wikibase:BestRank ; psv:P576 ?termAbolished ] }
+            OPTIONAL { ?term p:P582 [ a wikibase:BestRank ; psv:P582 ?termEnd ] }
           }
           wd:Q18354756 p:P580/psv:P580 ?farFuture .
 
-          BIND(COALESCE(?p39start, ?cabinetInception, ?cabinetStart) AS ?startNode)
-          BIND(COALESCE(?p39end,   ?cabinetAbolished, ?cabinetEnd, ?dod, ?farFuture) AS ?endNode)
+          BIND(COALESCE(?p39start, ?termInception, ?termStart) AS ?startNode)
+          BIND(COALESCE(?p39end,   ?termAbolished, ?termEnd, ?dod, ?farFuture) AS ?endNode)
           FILTER(BOUND(?startNode))
       }
     } AS %statements
@@ -68,20 +61,29 @@ module.exports = function () {
           ""
         ) AS ?endDate
       )
+      OPTIONAL { ?item wdt:P21/rdfs:label ?gender FILTER (LANG(?gender)="en") }
+
+      OPTIONAL {
+        ?ps pq:P4100 ?party .
+        OPTIONAL { ?party wdt:P1813 ?partyShortName FILTER (LANG(?partyShortName)="${meta.lang}")}
+        OPTIONAL { ?party rdfs:label ?partyName FILTER (LANG(?partyName)="${meta.lang}") }
+      }
+      BIND(COALESCE(?partyShortName, ?partyName) AS ?partyLabel)
+
+      OPTIONAL {
+        ?ps pq:P768 ?area .
+        OPTIONAL { ?area rdfs:label ?areaLabel FILTER (LANG(?areaLabel)="${meta.lang}") }
+      }
 
       OPTIONAL {
         ?ps prov:wasDerivedFrom ?ref .
-        ?ref pr:P4656 ?source FILTER CONTAINS(STR(?source), '${meta.source}') .
+        ?ref pr:P854 ?source FILTER CONTAINS(STR(?source), '${meta.reference.P854}') .
         OPTIONAL { ?ref pr:P1810 ?sourceName }
-        OPTIONAL { ?ref pr:P1932 ?statedName }
-        OPTIONAL { ?ref pr:P813  ?sourceDate }
       }
-      OPTIONAL { ?item rdfs:label ?labelName FILTER(LANG(?labelName) = "en") }
+      OPTIONAL { ?item rdfs:label ?labelName FILTER(LANG(?labelName) = "${meta.lang}") }
       BIND(COALESCE(?sourceName, ?labelName) AS ?itemLabel)
 
-      OPTIONAL { ?position rdfs:label ?positionEN FILTER(LANG(?positionEN) = "en") }
-      BIND(COALESCE(?statedName, ?positionEN) AS ?positionLabel)
     }
     # ${new Date().toISOString()}
-    ORDER BY ?sourceDate ?item ?psid`
+    ORDER BY ?start ?end ?item ?psid`
 }

@@ -1,10 +1,13 @@
+// qsv search -s item Q diff.csv | qsv search -s @@ '\+\+' | qsv select item,itemlabel,startdate,enddate | qsv behead | qsv fmt -t " "  | wd ee add-p39.js --batch
+
 const fs = require('fs');
 let rawmeta = fs.readFileSync('meta.json');
 let meta = JSON.parse(rawmeta);
 
 module.exports = (id, position, startdate, enddate) => {
   qualifier = {
-    P580: meta.cabinet.start,
+    P580: startdate || meta.cabinet.start,
+    P582: enddate   || meta.cabinet.end,
   }
 
   refs = { }
