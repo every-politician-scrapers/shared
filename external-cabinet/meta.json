@@ -1,20 +1,23 @@
 {
     "jurisdiction": {
-      "name": "Bulgaria",
-      "id": "Q219"
+      "name": "South Sudan",
+      "id": "Q958"
     },
     "cabinet": {
-      "id": "Q110026114",
-      "start": "2021-12-13",
-      "parent": "Q2396053"
+      "id": "Q112689988",
+      "start": "2013-07-31",
+      "end": "2016-04-28",
+      "parent": "Q4376010"
     },
-    "source": {
-        "url":   "https://www.gov.bg/en/Cabinet/CABINET-MEMBERS",
-        "title": "Council of Ministers of the Republic of Bulgaria :: CABINET MEMBERS",
-        "lang":  {
-            "code": "en",
-            "wikidata": "Q1860"
+    "reference": {
+        "P854": "https://ssnanews.com/index.php/2013/08/01/president-kiir-appoints-new-cabinet-vp-post-is-yet-to-be-determined/",
+        "P577": "2013-08-01",
+        "P1476": {
+            "text": "President Kiir appoints new cabinet",
+            "language": "en"
         }
     },
-    "agent": "every-politican-scrapers/bulgaria-cabinet"
+    "person_description": {
+        "en": "politician in South Sudan"
+    }
 }
