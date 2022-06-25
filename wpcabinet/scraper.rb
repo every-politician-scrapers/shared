@@ -16,18 +16,18 @@ class MemberList
   end
 
   class Member
-    field :id do
+    field :item do
       name_node.attr('wikidata')
     end
 
-    field :name do
+    field :itemLabel do
       name_node.text.tidy
     end
 
-    field :positionID do
+    field :position do
     end
 
-    field :position do
+    field :positionLabel do
       tds[1].text.tidy
     end
 

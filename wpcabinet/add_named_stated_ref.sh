@@ -33,7 +33,8 @@ claims=$(qsv search -u -i $scheck scraped.csv | qsv select $SCRAPED_NAME,$SCRAPE
 echo "$statementid $claims"
 echo "$statementid $claims" | xargs wd ar --maxlag 20 add-source-name.js > /dev/null
 
-lang=$(jq -r .lang meta.json)
+lang=$(jq -r '.lang // "en"' meta.json)
+
 existing=$(wd label $item -l $lang)
 if [[ $existing != $name ]]
 then
