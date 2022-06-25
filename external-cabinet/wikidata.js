@@ -3,9 +3,10 @@ let rawmeta = fs.readFileSync('meta.json');
 let meta = JSON.parse(rawmeta);
 
 module.exports = function () {
-  let fromd = `"${meta.cabinet.start}T00:00:00Z"^^xsd:dateTime`
-  let until = meta.cabinet.end  ? `"${meta.cabinet.end}T00:00:00Z"^^xsd:dateTime` : "NOW()"
-  let lang = meta.lang || 'en'
+  let fromd    = `"${meta.cabinet.start}T00:00:00Z"^^xsd:dateTime`
+  let until    = meta.cabinet.end  ? `"${meta.cabinet.end}T00:00:00Z"^^xsd:dateTime` : "NOW()"
+  let lang     = meta.lang || 'en'
+  let curronly = meta.current_only ? "MINUS { ?ps pq:P582 [] }" : ""
 
   return `SELECT DISTINCT ?item ?itemLabel ?position ?positionLabel
                  ?startDate ?endDate (STRAFTER(STR(?ps), STR(wds:)) AS ?psid)
@@ -22,6 +23,7 @@ module.exports = function () {
           OPTIONAL { ?item p:P570 [ a wikibase:BestRank ; psv:P570 ?dod ] }
           OPTIONAL { ?ps pqv:P580 ?p39start }
           OPTIONAL { ?ps pqv:P582 ?p39end }
+          ${curronly}
           OPTIONAL {
             ?ps pq:P5054 ?cabinet .
             OPTIONAL { ?cabinet p:P571 [ a wikibase:BestRank ; psv:P571 ?cabinetInception ] }
