@@ -129,6 +129,13 @@ qsv join positionid $TMPFILE position wikidata/wanted-positions.csv |
   qsv search -s end -v . |
   qsv select position,person,personID,start,gender,DOB,DOD,image,enwiki | uniq > html/current.csv
 
+# Generate stats
+count_leaders=$(qsv select personID html/current.csv | qsv dedup | qsv search Q | qsv count)
+count_historc=$(qsv select personID html/holders21.csv | qsv dedup | qsv search Q | qsv count)
+count_legislt=$(qsv select personID html/legislators.csv | qsv dedup | qsv search Q | qsv count)
+count_uniqppl=$((for f in html/[chl]*.csv; do qsv select personID $f; done) | qsv sort | qsv dedup | qsv search Q | qsv count)
+echo $count_leaders,$count_historc,$count_legislt,$count_uniqppl | tr -d ' ' | qsv rename -n "leaders,historic,legislators,unique" > html/stats.csv
+
 # Generate HTML
 erb country="$(jq -r .jurisdiction.name meta.json)" csvfile=html/current.csv -r csv -T- pcb/index.erb > html/index.html
 
