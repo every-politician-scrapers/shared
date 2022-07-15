@@ -4,7 +4,7 @@
 require 'every_politician_scraper/comparison'
 
 # TODO: pass the list of decorators as an argument
-diff = EveryPoliticianScraper::Comparison.new('wikidata.csv', 'scraped.csv').diff
+diff = EveryPoliticianScraper::DecoratedComparison.new('wikidata.csv', 'scraped.csv').diff
 diff = DaffDiff::Decorator.new(data: diff, cell_class: DaffDiff::Decorator::DatePrecision).decorated
 diff = DaffDiff::Decorator.new(data: diff, cell_class: DaffDiff::Decorator::Nullless).decorated
 diff = DaffDiff::Decorator.new(data: diff, cell_class: DaffDiff::Decorator::WithinWeek).decorated
