@@ -23,7 +23,7 @@ jobs:
     - name: Compare external sources to Wikidata
       id: run-comp
       run: |-
-        shopt -s globstar
+        shopt -s globstar nullglob
         (for comp in **/compare*.sh; do echo "# $comp" && echo "\`\`\`" && bash $comp; echo "\`\`\`"; done) 2>&1 | tee /tmp/OUTPUT
         body=$(cat /tmp/OUTPUT)
         body="${body//'%'/'%25'}"

@@ -18,7 +18,7 @@ jobs:
       run: bundle install
     - name: Run all mirroring scripts
       run: |-
-        shopt -s globstar
+        shopt -s globstar nullglob
         for script in **/mirror*.sh; do bash $script; done
     - name: Commit and push if changed
       run: |-
