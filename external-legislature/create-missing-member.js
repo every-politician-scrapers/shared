@@ -7,7 +7,7 @@ module.exports = (label,gender) => {
     value: meta.position,
     qualifiers: {
       P2937: meta.term.id,
-      P2715: meta.term.election,
+      P2715: meta.term.election || null,
     },
     references: {
       ...meta.reference,
