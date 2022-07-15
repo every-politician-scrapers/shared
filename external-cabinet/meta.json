@@ -1,23 +1,23 @@
 {
     "jurisdiction": {
-      "name": "South Sudan",
-      "id": "Q958"
+      "name": "Transnistria",
+      "id": "Q3537754"
     },
     "cabinet": {
-      "id": "Q112689988",
-      "start": "2013-07-31",
-      "end": "2016-04-28",
-      "parent": "Q4376010"
+      "id": "Q55664164",
+      "start": "2016-12-17",
+      "parent": "Q4375985"
     },
     "reference": {
-        "P854": "https://ssnanews.com/index.php/2013/08/01/president-kiir-appoints-new-cabinet-vp-post-is-yet-to-be-determined/",
-        "P577": "2013-08-01",
+        "P854":   "http://government.gospmr.org/sostav-pravitelstva/",
         "P1476": {
-            "text": "President Kiir appoints new cabinet",
-            "language": "en"
+            "text": "Состав Правительства",
+            "language": "ru"
         }
     },
+    "current_only": "true",
+    "lang": "ru",
     "person_description": {
-        "en": "politician in South Sudan"
+        "en": "politician in Transnistria"
     }
 }
