@@ -1,34 +1,36 @@
 #!/bin/zsh
 
-SCRAPED_NAME=itemLabel
-SCRAPED_POSN=positionLabel
-
-WIKIDATA_ITEM=item
-WIKIDATA_PSID=psid
+indent() { sed 's/^/  /' }
 
 wcheck=$1
-
-wikidata_count=$(qsv search -u -i $wcheck wikidata.csv | qsv count)
+wdresults="$(head -1 wikidata.csv)\n$(egrep -i $wcheck wikidata.csv)"
+wikidata_count=$(echo $wdresults | qsv count)
 if [[ $wikidata_count != 1 ]]
 then
   echo "No unique match to wikidata.csv ($wikidata_count):"
-  qsv search -u -i $wcheck wikidata.csv | qsv behead
+  echo $wdresults | qsv behead | indent
   return
 fi
-item=$(qsv search -u -i $wcheck wikidata.csv | qsv select $WIKIDATA_ITEM | qsv behead)
-statementid=$(qsv search -u -i $wcheck wikidata.csv | qsv select $WIKIDATA_PSID | qsv behead)
+
+item=$(echo $wdresults | qsv select item | qsv behead)
+statementid=$(echo $wdresults | qsv select psid | qsv behead)
+
+# If there's a second argument, use it for searching scraped.csv
+#  else use the first argument for that as well
 
 [[ -v 2 ]] && scheck=$2 || scheck=$1
-scraped_count=$(qsv search -u -i $scheck scraped.csv | qsv count)
+
+scraped_results="$(head -1 scraped.csv)\n$(egrep -i $scheck scraped.csv)"
+scraped_count=$(echo $scraped_results | qsv count)
 if [[ $scraped_count != 1 ]]
 then
   echo "No unique match to scraped.csv:"
-  qsv search -u -i $scheck scraped.csv | qsv behead
+  echo $scraped_results | qsv behead | indent
   return
 fi
 
-name=$(qsv search -u -i $scheck scraped.csv | qsv select $SCRAPED_NAME | qsv behead)
-claims=$(qsv search -u -i $scheck scraped.csv | qsv select $SCRAPED_NAME,$SCRAPED_POSN | qsv behead | qsv fmt --out-delimiter " ")
+name=$(echo $scraped_results   | qsv select itemLabel               | qsv behead)
+claims=$(echo $scraped_results | qsv select itemLabel,positionLabel | qsv behead | qsv fmt --out-delimiter " ")
 
 echo "$statementid $claims"
 echo "$statementid $claims" | xargs wd ar --maxlag 20 add-source-name.js > /dev/null
