@@ -11,28 +11,28 @@ class MemberList
     decorator WikidataIdsDecorator::Links
 
     def member_container
-      noko.xpath("//table[.//th[contains(.,'Fonction')]]//tr[td]")
+      noko.xpath("//table[.//th[contains(.,'Cartera')]]//tr[td]")
     end
   end
 
   class Member
-    field :item do
-      name_node.attr('wikidata')
+    field :id do
+      name_node.css('a/@wikidata').first
     end
 
-    field :itemLabel do
+    field :name do
       name_node.text.tidy
     end
 
-    field :position do
+    field :positionID do
     end
 
-    field :positionLabel do
-      tds[1].text.tidy
+    field :position do
+      tds[0].text.tidy
     end
 
     field :startDate do
-      '2021-04-26'
+      WikipediaDate::Spanish.new(raw_start).to_s
     end
 
     field :endDate do
@@ -45,7 +45,11 @@ class MemberList
     end
 
     def name_node
-      tds[2].css('a').first
+      tds[1]
+    end
+
+    def raw_start
+      tds[2].text.split('-').first
     end
   end
 end
