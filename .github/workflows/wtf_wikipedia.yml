@@ -18,9 +18,16 @@ jobs:
         curl -L https://raw.githubusercontent.com/every-politician-scrapers/shared/main/bin/wtf_enwiki.sh -o /usr/local/bin/wtf_enwiki.sh
     - name: Run mirroring
       run: |-
-        git rm -rf --ignore-unmatch enwiki
+        rm -rf enwiki
         bash /usr/local/bin/wtf_enwiki.sh
-        git add enwiki
+    - name: Directly commit raw output
+      run: |-
+        git config user.name "Automated"
+        git config user.email "actions@users.noreply.github.com"
+        git add enwiki/wtf
+        timestamp=$(date -u)
+        git commit -m "Update wtf archive: ${timestamp}" || exit 0
+        git push
     - name: Create pull request
       id: cpr
       uses: peter-evans/create-pull-request@v3
@@ -29,7 +36,7 @@ jobs:
         committer: GitHub <noreply@github.com>
         author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
         signoff: false
-        branch: wtf-update
+        branch: wtf
         delete-branch: true
         title: 'Update wtf_wikipedia mirror'
         assignees: tmtmtmtm
