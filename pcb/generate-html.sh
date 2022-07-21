@@ -81,7 +81,7 @@ jq -r 'def highest(array): (array | sort_by(.rank) | reverse | first.value);
 # TODO: dates? other relationships.
 jq -r '{
     id: .id,
-    name: .labels.en,
+    name: (.labels.en // first(.labels[])),
     family: {
       father: [(.claims.P22[] | .value)],
       mother: [(.claims.P25[] | .value)],
